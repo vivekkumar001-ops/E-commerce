@@ -7,6 +7,9 @@ import {
   productPhotoController,
   deleteProductController,
   updateProductController,
+  productFilterController,
+  productCountController,
+  productListController,
 } from "../controller/productController.js";
 import { requireSignIn, isAdmin } from "../middlewares/authMiddleware.js";
 
@@ -42,5 +45,12 @@ router.delete(
   isAdmin,
   deleteProductController
 );
+// product filters
+router.post("/product-filters",productFilterController );
+// product count
+router.get("/product-count", productCountController);
+// product per page
+router.get("/product-list/:page", productListController);
+
 
 export default router;
