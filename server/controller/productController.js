@@ -145,8 +145,6 @@ export const deleteProductController = async (req, res) => {
   }
 };
 
-
-
 // UPDATE PRODUCT
 export const updateProductController = async (req, res) => {
   try {
@@ -154,9 +152,7 @@ export const updateProductController = async (req, res) => {
       req.fields;
     const { photo } = req.files;
 
-
     // VALIDATION
-
     switch (true) {
       case !name:
         return res.status(500).send({ error: "Name is Required" });
