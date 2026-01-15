@@ -6,7 +6,6 @@ import axios from "axios";
 import { Select } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 
-
 const { Option } = Select;
 
 const UpdateProduct = () => {
