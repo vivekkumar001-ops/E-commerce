@@ -10,6 +10,8 @@ import {
   productFilterController,
   productCountController,
   productListController,
+  braintreeTokenController,
+  braintreePaymentController,
 } from "../controller/productController.js";
 import { requireSignIn, isAdmin } from "../middlewares/authMiddleware.js";
 
@@ -52,5 +54,10 @@ router.get("/product-count", productCountController);
 // product per page
 router.get("/product-list/:page", productListController);
 
+// PAYMENT ROUTES
+// TOKEN
+router.post("/braintree/token", braintreeTokenController);
+// PAYMENT
+router.post("/braintree/payment", requireSignIn, braintreePaymentController);
 
 export default router;
