@@ -10,9 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "antd": "^6.1.4",
+    "antd": "^6.2.0",
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
+    "braintree-web": "^3.134.0",
+    "braintree-web-drop-in": "^1.46.0",
+    "braintree-web-drop-in-react": "^1.2.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-helmet": "^6.1.0",

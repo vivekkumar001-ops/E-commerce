@@ -2,9 +2,12 @@ import { NavLink } from "react-router-dom";
 import React from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/auth";
+import { useCart } from "../../context/Cart";
+import { Badge } from "antd";
 
 function Header() {
-  const { auth, setAuth } = useAuth();
+  const {auth, setAuth } = useAuth();
+  const [cart, setCart] = useCart();
 
   const handleLogout = () => {
     setAuth({
@@ -15,6 +18,7 @@ function Header() {
     localStorage.removeItem("auth");
     toast.success("Logout Successfully");
   };
+
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -121,7 +125,13 @@ function Header() {
                 </ul>
               </li>
             )}
-
+              <li className="nav-item">
+                <Badge count={cart.length} showZero>
+                  <NavLink className="nav-link" to="/cart">
+                      Cart
+                  </NavLink>
+                </Badge>
+              </li>
           </ul>
         </div>
       </div>

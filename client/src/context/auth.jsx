@@ -8,8 +8,8 @@ const AuthProvider = ({ children }) => {
     user: null,
     token: "",
   });
-
-
+  
+// default axios
   axios.defaults.headers.common["Authorization"] = auth?.token;
 
   useEffect(() => {
@@ -24,14 +24,14 @@ const AuthProvider = ({ children }) => {
     }
 
   }, []);
-
+// eslint-disable-next-line
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
+// Custom hook
 const useAuth = () => useContext(AuthContext);
 
 export { useAuth, AuthProvider };
