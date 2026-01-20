@@ -5,12 +5,12 @@ import { Prices } from "../components/prices";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Layout from "../components/Layouts/Layout";
-// import { AiOutlineReload } from "react-icons/ai";
-// import { useCart } from "../context/Cart";
+import { AiOutlineReload } from "react-icons/ai";
+import { useCart } from "../context/Cart";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  // const [cart, setCart] = useCart();
+  const [cart, setCart] = useCart();
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -34,6 +34,7 @@ const HomePage = () => {
 
   useEffect(() => {
     getAllCategory();
+    getTotal();
   }, []);
 
   // get products
@@ -100,7 +101,7 @@ const HomePage = () => {
 
   useEffect(() => {
     if (!checked.length || !radio.length) filterProduct();
-  }, [checked.length, radio.length]);
+  }, [checked, radio]);
 
   // get filtered product
   const filterProduct = async () => {

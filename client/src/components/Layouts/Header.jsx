@@ -55,7 +55,7 @@ function Header() {
               </NavLink>
             </li>
 
-            <li className="nav-item">
+            <li className="nav-item">             
               <NavLink className="nav-link" to="/cart">
                 Cart
               </NavLink>
@@ -73,6 +73,7 @@ function Header() {
               </NavLink>
             </li>
           </ul>
+          
 
           {/* RIGHT SIDE */}
           <ul className="navbar-nav ms-auto">
