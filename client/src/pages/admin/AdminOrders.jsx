@@ -1,32 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import AdminMenu from "../../components/Layouts/AdminMenu";
 import Layout from "../../components/Layouts/Layout";
+import AdminMenu from "../../components/Layouts/AdminMenu";
 import { useAuth } from "../../context/auth";
 import moment from "moment";
-import { Select } from "antd";
+import { Select, Tag } from "antd";
 
 const { Option } = Select;
 
-const AdminOrders = () => {
-  const [status, setStatus] = useState([
-    "Not Process",
-    "Processing",
-    "Shipped",
-    "Delivered",
-    "Cancel",
-  ]);
-  const [changeStatus, setChangeStatus] = useState("");
-  const [orders, setOrders] = useState([]);
-  const {auth, setAuth} = useAuth();
+const ORDER_STATUS = [
+  "Not Process",
+  "Processing",
+  "Shipped",
+  "Delivered",
+  "Cancel",
+];
 
+const AdminOrders = () => {
+  const [orders, setOrders] = useState([]);
+  const { auth } = useAuth();
+
+  // ======================
+  // GET ALL ORDERS
+  // ======================
   const getOrders = async () => {
     try {
       const { data } = await axios.get("/api/v1/auth/all-orders");
-      setOrders(data);
+      setOrders(data || []);
     } catch (error) {
       console.log(error);
+      toast.error("Failed to fetch orders");
     }
   };
 
@@ -34,95 +38,135 @@ const AdminOrders = () => {
     if (auth?.token) getOrders();
   }, [auth?.token]);
 
-  const handleChange = async (orderId, value) => {
+  // ======================
+  // UPDATE STATUS
+  // ======================
+  const handleStatusChange = async (orderId, value) => {
     try {
-      const { data } = await axios.put(
+      await axios.put(
         `/api/v1/auth/order-status/${orderId}`,
         { status: value }
       );
+      toast.success("Order status updated");
       getOrders();
     } catch (error) {
       console.log(error);
+      toast.error("Status update failed");
     }
   };
 
   return (
-    <Layout title={"All Orders Data"}>
-      <div className="row dashboard">
-        <div className="col-md-3">
-          <AdminMenu />
-        </div>
+    <Layout title="Admin Orders">
+      <div className="container-fluid dashboard py-3">
+        <div className="row">
+          <div className="col-md-3 mb-2">
+            <AdminMenu />
+          </div>
 
-        <div className="col-md-9">
-          <h1 className="text-center">All Orders</h1>
+          <div className="col-md-9">
+            <h2 className="text-center mb-4">All Orders</h2>
 
-          {orders?.map((o, i) => (
-            <div key={o._id} className="border shadow mb-4">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Buyer</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">Payment</th>
-                    <th scope="col">Quantity</th>
-                  </tr>
-                </thead>
+            {orders.length === 0 && (
+              <p className="text-center text-muted">
+                No orders available
+              </p>
+            )}
 
-                <tbody>
-                  <tr>
-                    <td>{i + 1}</td>
-                    <td>
+            {orders.map((o, index) => (
+              <div
+                key={o._id}
+                className="card shadow-sm mb-4"
+              >
+                {/* ORDER HEADER */}
+                <div className="card-body border-bottom">
+                  <div className="row text-center text-md-start">
+                    <div className="col-md-2">
+                      <strong>#</strong> {index + 1}
+                    </div>
+
+                    <div className="col-md-3">
                       <Select
-                        bordered={false}
+                        size="small"
+                        value={o.status}
                         onChange={(value) =>
-                          handleChange(o._id, value)
+                          handleStatusChange(o._id, value)
                         }
-                        defaultValue={o?.status}
+                        className="w-100"
                       >
-                        {status.map((s, i) => (
-                          <Option key={i} value={s}>
+                        {ORDER_STATUS.map((s) => (
+                          <Option key={s} value={s}>
                             {s}
                           </Option>
                         ))}
                       </Select>
-                    </td>
-                    <td>{o?.buyer?.name}</td>
-                    <td>{moment(o?.createdAt).fromNow()}</td>
-                    <td>
-                      {o?.payment?.success ? "Success" : "Failed"}
-                    </td>
-                    <td>{o?.products?.length}</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div className="container">
-                {o?.products?.map((p, i) => (
-                  <div
-                    key={p._id}
-                    className="row mb-2 p-3 card flex-row"
-                  >
-                    <div className="col-md-4">
-                      <img
-                        src={`/api/v1/product/product-photo/${p._id}`}
-                        className="card-img-top"
-                        alt={p.name}
-                        width="100px"
-                        height="100px"
-                      />
                     </div>
-                    <div className="col-md-8">
-                      <p>{p.name}</p>
-                      <p>{p.description.substring(0, 30)}</p>
-                      <p>Price : {p.price}</p>
+
+                    <div className="col-md-2">
+                      <Tag color="blue">
+                        {o?.buyer?.name}
+                      </Tag>
+                    </div>
+
+                    <div className="col-md-2">
+                      {moment(o.createdAt).fromNow()}
+                    </div>
+
+                    <div className="col-md-2">
+                      <Tag
+                        color={
+                          o?.payment?.success
+                            ? "green"
+                            : "red"
+                        }
+                      >
+                        {o?.payment?.success
+                          ? "Paid"
+                          : "Failed"}
+                      </Tag>
+                    </div>
+
+                    <div className="col-md-1">
+                      {o?.products?.length}
                     </div>
                   </div>
-                ))}
+                </div>
+
+                {/* PRODUCTS */}
+                <div className="card-body">
+                  {o.products.map((p) => (
+                    <div
+                      key={p._id}
+                      className="row align-items-center mb-3 border rounded p-2"
+                    >
+                      <div className="col-md-2 text-center">
+                        <img
+                          src={`/api/v1/product/product-photo/${p._id}`}
+                          alt={p.name}
+                          className="img-fluid rounded"
+                          style={{
+                            maxHeight: "80px",
+                          }}
+                        />
+                      </div>
+
+                      <div className="col-md-6">
+                        <h6 className="mb-1">
+                          {p.name}
+                        </h6>
+                        <p className="text-muted small mb-0">
+                          {p.description.substring(0, 50)}...
+                        </p>
+                      </div>
+
+                      <div className="col-md-2 fw-semibold">
+                        ₹ {p.price}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </Layout>

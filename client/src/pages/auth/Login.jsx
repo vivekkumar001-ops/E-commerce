@@ -9,37 +9,39 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { auth, setAuth } = useAuth(); 
+  const { auth, setAuth } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
 
-  // form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await axios.post("/api/v1/auth/login", {
+      const { data } = await axios.post("/api/v1/auth/login", {
         email,
         password,
       });
 
-      if (res.data.success) {
-        toast.success(res.data.message);
+      if (data.success) {
+        toast.success(data.message);
 
-        setAuth({
-          ...auth,
-          user: res.data.user,
-          token: res.data.token,
-        });
+        const authData = {
+          user: data.user,
+          token: data.token,
+        };
 
-        // save auth data
-        localStorage.setItem("auth", JSON.stringify(res.data));
+        // ✅ Context update
+        setAuth(authData);
+
+        // ✅ LocalStorage fix
+        localStorage.setItem("auth", JSON.stringify(authData));
 
         navigate(location.state || "/");
       } else {
-        toast.success(res.data.message);
+        toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "login failed");
+      toast.error(error.response?.data?.message || "Login failed");
     }
   };
 
@@ -52,24 +54,24 @@ function Login() {
         className="col-md-6 offset-md-3 w-50 mx-auto p-3 border bg-light"
       >
         <div className="mb-3">
-          <label className="form-label">Email:</label>
+          <label>Email:</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="form-control"
-            placeholder="Enter email"
+            required
           />
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Password:</label>
+          <label>Password:</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="form-control"
-            placeholder="Enter password"
+            required
           />
         </div>
 

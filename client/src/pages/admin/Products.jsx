@@ -9,22 +9,22 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ======================
-  // GET ALL PRODUCTS
-  // ======================
   const getAllProducts = async () => {
     try {
       setLoading(true);
       const { data } = await axios.get("/api/v1/product/get-products");
 
       if (data?.success) {
-        setProducts(data.products);
+        // ✅ ensure it's always an array
+        setProducts(Array.isArray(data?.products) ? data.products : []);
       } else {
         toast.error(data?.message || "Failed to load products");
+        setProducts([]);
       }
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong while fetching products");
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -49,37 +49,44 @@ const Products = () => {
 
             {loading ? (
               <p className="text-center">Loading products...</p>
-            ) : products.length === 0 ? (
+            ) : products?.length === 0 ? (
               <p className="text-center text-muted">No products found</p>
             ) : (
-              <div className="d-flex flex-wrap">
-                {products.map((product) => (
-                  <Link
-                    key={product._id}
-                    to={`/dashboard/admin/product/${product.slug}`}
-                    className="text-decoration-none text-dark"
-                  >
-                    <div className="card m-2" style={{ width: "18rem" }}>
-                      <img
-                        src={`/api/v1/product/product-photo/${product._id}`}
-                        className="card-img-top"
-                        alt={product.name}
-                        style={{ height: "200px", objectFit: "cover" }}
-                        onError={(e) => {
-                          e.target.src = "/images/no-image.png";
-                        }}
-                      />
+              <div className="row g-3">
+                {products?.map((product) => (
+                  <div className="col-12 col-sm-6 col-lg-4" key={product?._id}>
+                    <Link
+                      to={`/dashboard/admin/product/${product?.slug}`}
+                      className="text-decoration-none text-dark"
+                    >
+                      <div className="card h-100 shadow-sm">
+                        <img
+                          src={`/api/v1/product/product-photo/${product?._id}`}
+                          className="card-img-top"
+                          alt={product?.name || "Product"}
+                          style={{ height: "200px", objectFit: "cover" }}
+                          onError={(e) => {
+                            // ✅ stop infinite loop if fallback image missing
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/images/no-image.png";
+                          }}
+                        />
 
-                      <div className="card-body">
-                        <h5 className="card-title">
-                          {product.name}
-                        </h5>
-                        <p className="card-text">
-                          {product.description?.substring(0, 60)}...
-                        </p>
+                        <div className="card-body">
+                          <h5 className="card-title">
+                            {product?.name || "No Name"}
+                          </h5>
+                          <p className="card-text">
+                            {product?.description
+                              ? product.description.length > 60
+                                ? product.description.substring(0, 60) + "..."
+                                : product.description
+                              : "No description"}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
+                    </Link>
+                  </div>
                 ))}
               </div>
             )}
