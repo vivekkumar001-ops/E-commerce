@@ -1,23 +1,23 @@
 import express from "express";
-import formidable from "express-formidable";
 import {
+  brainTreePaymentController,
+  braintreeTokenController,
   createProductController,
+  deleteProductController,
   getProductController,
   getSingleProductController,
-  productPhotoController,
-  deleteProductController,
-  updateProductController,
-  productFilterController,
   productCountController,
+  productFilterController,
   productListController,
-  braintreeTokenController,
-  braintreePaymentController,
+  productPhotoController,
+  updateProductController,
 } from "../controller/productController.js";
-import { requireSignIn, isAdmin } from "../middlewares/authMiddleware.js";
+import { isAdmin, requireSignIn } from "../middlewares/authMiddleware.js";
+import formidable from "express-formidable";
 
 const router = express.Router();
 
-// CREATE
+// CREATE PRODUCT
 router.post(
   "/create-product",
   requireSignIn,
@@ -26,38 +26,45 @@ router.post(
   createProductController
 );
 
-// READ
-router.get("/get-products", getProductController);
-router.get("/get-product/:slug", getSingleProductController);
-router.get("/product-photo/:pid", productPhotoController);
-
-// UPDATE
+// UPDATE PRODUCT
 router.put(
-  "/update-product/:pid",
+  "/update-product/:pid", 
   requireSignIn,
   isAdmin,
   formidable(),
   updateProductController
 );
 
-// DELETE
+// GET PRODUCT PHOTO
+router.get("/product-photo/:pid", productPhotoController);
+
+// GET SINGLE PRODUCT
+router.get("/get-product/:slug", getSingleProductController);
+
+// GET ALL PRODUCTS
+router.get("/get-product", getProductController);
+
+// DELETE PRODUCT
 router.delete(
-  "/delete-product/:pid",
+  "/delete-product/:pid", 
   requireSignIn,
   isAdmin,
   deleteProductController
 );
-// product filters
-router.post("/product-filters",productFilterController );
-// product count
-router.get("/product-count", productCountController);
-// product per page
-router.get("/product-list/:page", productListController);
 
-// PAYMENT ROUTES
-// TOKEN
-router.post("/braintree/token", braintreeTokenController);
-// PAYMENT
-router.post("/braintree/payment", requireSignIn, braintreePaymentController);
+//filter
+router.post("/product-filters", productFilterController);
+
+//product count 
+router.get("/product-count", productCountController)
+
+//product per page
+router.get("/product-list/:page", productListController)
+
+//payements routes
+//token
+router.get("/braintree/token", braintreeTokenController);
+//payements
+router.post("/braintree/payment", requireSignIn, brainTreePaymentController)
 
 export default router;

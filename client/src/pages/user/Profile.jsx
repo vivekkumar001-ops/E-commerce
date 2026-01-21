@@ -6,50 +6,78 @@ import toast from "react-hot-toast";
 import axios from "axios";
 
 const Profile = () => {
-  // context
-  const [auth, setAuth] = useAuth();
+  // =========================
+  // CONTEXT
+  // =========================
+  const { auth, setAuth } = useAuth();
 
-  // state
+  // =========================
+  // STATE
+  // =========================
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
 
-  // get user data
+  // =========================
+  // LOAD USER DATA
+  // =========================
   useEffect(() => {
-    const { email, name, phone, address } = auth?.user;
-    setName(name);
-    setEmail(email);
-    setPhone(phone);
-    setAddress(address);
+    if (auth?.user) {
+      const { name, email, phone, address } = auth.user;
+      setName(name || "");
+      setEmail(email || "");
+      setPhone(phone || "");
+      setAddress(address || "");
+    }
   }, [auth?.user]);
 
-  // form function
+  // =========================
+  // SUBMIT FORM
+  // =========================
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const { data } = await axios.put("/api/v1/auth/profile", {
+      const payload = {
         name,
-        email,
-        password,
         phone,
         address,
-      });
+      };
+
+      if (password) {
+        payload.password = password;
+      }
+
+      const { data } = await axios.put(
+        "/api/v1/auth/profile",
+        payload
+      );
 
       if (data?.error) {
-        toast.error(data?.error);
+        toast.error(data.error);
       } else {
-        setAuth({ ...auth, user: data?.updatedUser });
-        let ls = localStorage.getItem("auth");
-        ls = JSON.parse(ls);
-        ls.user = data.updatedUser;
-        localStorage.setItem("auth", JSON.stringify(ls));
+        // ✅ update auth context
+        setAuth((prev) => ({
+          ...prev,
+          user: data.updatedUser,
+        }));
+
+        // ✅ safe localStorage update
+        const ls = localStorage.getItem("auth");
+        if (ls) {
+          const authData = JSON.parse(ls);
+          authData.user = data.updatedUser;
+          localStorage.setItem("auth", JSON.stringify(authData));
+        }
+
         toast.success("Profile Updated Successfully");
+        setPassword("");
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong");
+      toast.error("Profile update failed");
     }
   };
 
@@ -62,10 +90,7 @@ const Profile = () => {
           </div>
 
           <div className="col-md-8">
-            <div
-              className="form-container"
-              style={{ marginTop: "-40px" }}
-            >
+            <div className="form-container" style={{ marginTop: "-40px" }}>
               <form onSubmit={handleSubmit}>
                 <h4 className="title">USER PROFILE</h4>
 
@@ -75,7 +100,6 @@ const Profile = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="form-control"
-                    id="exampleInputEmail1"
                     placeholder="Enter Your Name"
                     autoFocus
                   />
@@ -85,10 +109,7 @@ const Profile = () => {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
                     className="form-control"
-                    id="exampleInputEmail1"
-                    placeholder="Enter Your Email"
                     disabled
                   />
                 </div>
@@ -99,8 +120,7 @@ const Profile = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="form-control"
-                    id="exampleInputPassword1"
-                    placeholder="Enter Your Password"
+                    placeholder="Enter New Password (optional)"
                   />
                 </div>
 
@@ -110,7 +130,6 @@ const Profile = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="form-control"
-                    id="exampleInputEmail1"
                     placeholder="Enter Your Phone"
                   />
                 </div>
@@ -121,7 +140,6 @@ const Profile = () => {
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     className="form-control"
-                    id="exampleInputEmail1"
                     placeholder="Enter Your Address"
                   />
                 </div>

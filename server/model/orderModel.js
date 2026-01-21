@@ -1,4 +1,5 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+
 const orderSchema = new mongoose.Schema(
     {
         products: [
@@ -10,21 +11,16 @@ const orderSchema = new mongoose.Schema(
         payment: {},
         buyer: {
             type: mongoose.ObjectId,
-            ref: "Users",
+            ref: "users",
         },
         status: {
             type: String,
-            default: "Not Processed",
-            enum: [
-                "Not Processed",
-                "Processing",
-                "Shipped",
-                "Delivered",
-                "Cancelled",
-            ],
+            default: "Not process",
+            enum:["Not Process", "Processing", "Shipped", "Delivered", "Cancel"],
+            default: "Not Process",
         },
     },
-    { timestamps: true }
-);  
-export const orderModel = mongoose.model("Orders", orderSchema);
-    
+    {timestamps: true}
+);
+
+export default mongoose.model("Order", orderSchema);

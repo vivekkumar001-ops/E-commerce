@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Layout from "../components/Layouts/Layout";
 import { useCart } from "../context/Cart";
 import { useAuth } from "../context/auth";
@@ -13,7 +13,9 @@ const CartPage = () => {
   const [clientToken, setClientToken] = useState("");
   const [instance, setInstance] = useState("");
   const [loading, setLoading] = useState(false);
-const navigate = useNavigate();
+  const dropinContainerRef = useRef(null);
+  const navigate = useNavigate();
+  
   // =====================
   // TOTAL PRICE
   // =====================
@@ -66,6 +68,30 @@ const navigate = useNavigate();
   }, [auth?.token]);
 
   // =====================
+  // INITIALIZE DROP-IN
+  // =====================
+  useEffect(() => {
+    if (clientToken && dropinContainerRef.current && !instance) {
+      DropIn.create(
+        {
+          authorization: clientToken,
+          container: dropinContainerRef.current,
+          paypal: {
+            flow: "vault",
+          },
+        },
+        (error, inst) => {
+          if (error) {
+            console.error(error);
+          } else {
+            setInstance(inst);
+          }
+        }
+      );
+    }
+  }, [clientToken]);
+
+  // =====================
   // HANDLE PAYMENT
   // =====================
   const handlePayment = async () => {
@@ -109,8 +135,8 @@ const navigate = useNavigate();
           <div className="row">
             {/* CART ITEMS */}
             <div className="col-md-7 p-0 m-0">
-              {cart?.map((p) => (
-                <div className="row card flex-row" key={p._id}>
+              {cart?.map((p, index) => (
+                <div className="row card flex-row" key={index}>
                   <div className="col-md-4">
                     <img
                       src={`/api/v1/product/product-photo/${p._id}`}
@@ -188,15 +214,7 @@ const navigate = useNavigate();
                   ""
                 ) : (
                   <>
-                    <DropIn
-                      options={{
-                        authorization: clientToken,
-                        paypal: {
-                          flow: "vault",
-                        },
-                      }}
-                      onInstance={(instance) => setInstance(instance)}
-                    />
+                    <div ref={dropinContainerRef} />
                     <button
                       className="btn btn-primary"
                       onClick={handlePayment}

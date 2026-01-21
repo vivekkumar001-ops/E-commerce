@@ -6,7 +6,7 @@ import { useCart } from "../../context/Cart";
 import { Badge } from "antd";
 
 function Header() {
-  const {auth, setAuth } = useAuth();
+  const { auth, setAuth } = useAuth();
   const [cart, setCart] = useCart();
 
   const handleLogout = () => {
@@ -19,11 +19,9 @@ function Header() {
     toast.success("Logout Successfully");
   };
 
-
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
-
         {/* BRAND */}
         <NavLink to="/" className="navbar-brand fw-bold">
           MyShop
@@ -42,7 +40,6 @@ function Header() {
         {/* MENU */}
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-
             <li className="nav-item">
               <NavLink className="nav-link" to="/">
                 Home
@@ -55,11 +52,13 @@ function Header() {
               </NavLink>
             </li>
 
-            <li className="nav-item">             
+            {/* <li className="nav-item">  
+              <Badge count={cart.length} showZero>      
               <NavLink className="nav-link" to="/cart">
                 Cart
               </NavLink>
-            </li>
+              </Badge>     
+            </li> */}
 
             <li className="nav-item">
               <NavLink className="nav-link" to="/policy">
@@ -73,11 +72,9 @@ function Header() {
               </NavLink>
             </li>
           </ul>
-          
 
           {/* RIGHT SIDE */}
           <ul className="navbar-nav ms-auto">
-
             {!auth?.user ? (
               <>
                 <li className="nav-item">
@@ -111,7 +108,7 @@ function Header() {
                         auth?.user?.role === 1 ? "admin" : "user"
                       }`}
                     >
-                      Dashboard
+                     Dashboard
                     </NavLink>
                   </li>
 
@@ -126,13 +123,13 @@ function Header() {
                 </ul>
               </li>
             )}
-              <li className="nav-item">
-                <Badge count={cart.length} showZero>
-                  <NavLink className="nav-link" to="/cart">
-                      Cart
-                  </NavLink>
+            <li>
+              <NavLink className="nav-link" to="/cart">
+                <Badge className="text-white" count={cart.length} showZero>
+                  🛒 Cart
                 </Badge>
-              </li>
+              </NavLink>
+            </li>
           </ul>
         </div>
       </div>

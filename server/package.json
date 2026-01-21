@@ -3,7 +3,7 @@
   "dependencies": {
     "antd": "^6.1.4",
     "bcrypt": "^6.0.0",
-    "braintree": "^3.34.0",
+    "braintree": "^3.35.0",
     "colors": "^1.4.0",
     "concurrently": "^9.2.1",
     "cors": "^2.8.5",

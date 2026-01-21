@@ -17,9 +17,9 @@ import Products from "./admin/Products";
 import UpdateProduct from "./admin/UpdateProduct";
 import Dashboard from "./user/Dashboard";
 import Profile from "./user/Profile";
-// import Orders from "./user/Orders";
+import Orders from "./user/Orders";
 import Users from "./admin/Users";
-// import AdminOrders from "./admin/AdminOrders";
+import AdminOrders from "./admin/AdminOrders";
 
 
 
@@ -40,7 +40,7 @@ function App() {
 
       <Route path="/dashboard" element={<PrivateRoutes />}>
         <Route path="user" element={<Dashboard />} />
-        {/* <Route path="user/orders" element={<Orders />} /> */}
+        <Route path="user/orders" element={<Orders />} />
         <Route path="user/profile" element={<Profile />} />
       </Route>
       <Route path="/dashboard" element={<AdminRoutes />}>
@@ -50,7 +50,7 @@ function App() {
         <Route path="admin/users" element={<Users />} />
         <Route path="admin/products" element={<Products />} />
         <Route path="admin/product/:slug" element={<UpdateProduct />} />
-        {/* <Route path="admin/orders" element={<AdminOrders />} /> */}
+        <Route path="admin/orders" element={<AdminOrders />} />
       </Route>
 
       </Routes >
